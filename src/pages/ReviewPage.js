@@ -1,7 +1,12 @@
 import React from 'react';
+import './ReviewPage.css';
 
 function ReviewPage() {
-  return <h2>Review Page</h2>;
+  return (
+    <div className="review-page">
+      <h2>Welcome to the Review Page</h2>
+    </div>
+  );
 }
 
 export default ReviewPage;
