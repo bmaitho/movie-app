@@ -1,30 +1,20 @@
 import React from 'react';
-import { Route, Routes, Link } from 'react-router-dom';
-import Home from './HomePage';
-import About from './MoviePage';
-import About from './ReviewPage';
-import Contact from './ProfilePage';
+import { Route, Routes } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import HomePage from './pages/HomePage';
+import MoviePage from './pages/MoviePage';
+import ProfilePage from './pages/ProfilePage';
+import ReviewPage from './pages/ReviewPage';
 
 function App() {
   return (
     <div>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/contact">Contact</Link>
-          </li>
-        </ul>
-      </nav>
+      <NavBar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/movies" element={<MoviePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/reviews" element={<ReviewPage />} />
       </Routes>
     </div>
   );
