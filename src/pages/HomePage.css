@@ -1,25 +1,41 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body, html {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .home-page {
-    height: 100vh;
-    width: 100vw;
-    background: url('../assets/image.jpeg') no-repeat center center fixed;
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    text-shadow: 2px 2px 4px #000;
-  }
-  
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.home-page {
+  position: relative; /* Make the container relative to position the overlay */
+  height: 100vh;
+  width: 100vw;
+  background: url('../assets/WhatsApp\ Image\ 2024-07-10\ at\ 14.25.05.jpeg') no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 2px 2px 4px #000;
+}
+
+.home-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  z-index: 1; /* Ensure the overlay is above the background image */
+}
+
+.home-page-content {
+  position: relative; /* Ensure content is above the overlay */
+  z-index: 2;
+}
