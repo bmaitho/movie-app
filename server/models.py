@@ -1,42 +1,73 @@
-from app import db
-from datetime import datetime
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.hybrid import hybrid_property
+from config import db, bcrypt
 
-class Movie(db.Model):
-    __tablename__ = 'movie'
-    movie_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String, nullable=False)
-    release_date = db.Column(db.DateTime, nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    poster_url = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class User(db.Model, SerializerMixin):
+    __tablename__ = 'users'
 
-class User(db.Model):
-    __tablename__ = 'user'
-    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_name = db.Column(db.String(30), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
-    password_hash = db.Column(db.String, nullable=False)
+    _password_hash = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-class Review(db.Model):
-    __tablename__ = 'review'
-    review_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-    movie_id = db.Column(db.Integer, db.ForeignKey('movie.movie_id'), nullable=False)
-    rating = db.Column(db.Float, nullable=False)
-    comment = db.Column(db.String, nullable=False)
+    reviews = db.relationship('Review', backref='user')
 
-    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
-    movie = db.relationship('Movie', backref=db.backref('reviews', lazy=True))
+    serialize_rules = ('-._password_hash', '-reviews', '-created_at', '-updated_at')
 
-class Genre(db.Model):
-    __tablename__ = 'genre'
-    genre_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    @hybrid_property
+    def password_hash(self):
+        return self._password_hash
+
+    @password_hash.setter
+    def password_hash(self, password):
+        self._password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def authenticate(self, password):
+        return bcrypt.check_password_hash(self._password_hash, password)
+
+class Movie(db.Model, SerializerMixin):
+    __tablename__ = 'movies'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, unique=True, nullable=False)
+    description = db.Column(db.String)
+    release_date = db.Column(db.DateTime)
+    director = db.Column(db.String)
+    rating = db.Column(db.Float)
+
+    reviews = db.relationship('Review', backref='movie')
+    genres = association_proxy('movie_genres', 'genre')
+
+    serialize_rules = ('-reviews', 'genres')
+
+class Review(db.Model, SerializerMixin):
+    __tablename__ = 'reviews'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'))
+    content = db.Column(db.String)
+    rating = db.Column(db.Float)
+
+    serialize_rules = ('-user', '-movie')
+
+class Genre(db.Model, SerializerMixin):
+    __tablename__ = 'genres'
+
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
 
-class MovieGenre(db.Model):
-    __tablename__ = 'movie_genre'
-    movie_id = db.Column(db.Integer, db.ForeignKey('movie.movie_id'), primary_key=True)
-    genre_id = db.Column(db.Integer, db.ForeignKey('genre.genre_id'), primary_key=True)
+    movie_genres = db.relationship('MovieGenre', backref='genre')
 
-    movie = db.relationship('Movie', backref=db.backref('movie_genres', lazy=True))
-    genre = db.relationship('Genre', backref=db.backref('movie_genres', lazy=True))
+class MovieGenre(db.Model, SerializerMixin):
+    __tablename__ = 'movie_genres'
+
+    id = db.Column(db.Integer, primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'))
+    genre_id = db.Column(db.Integer, db.ForeignKey('genres.id'))
+
+    serialize_rules = ('-movie', '-genre')
