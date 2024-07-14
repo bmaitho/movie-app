@@ -1,73 +1,87 @@
-from sqlalchemy_serializer import SerializerMixin
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import validates
-from sqlalchemy.ext.hybrid import hybrid_property
-from config import db, bcrypt
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from config import db
 
-class User(db.Model, SerializerMixin):
-    __tablename__ = 'users'
-
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
-    _password_hash = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    admin = db.Column(db.Boolean, default=False)
 
-    reviews = db.relationship('Review', backref='user')
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
 
-    serialize_rules = ('-._password_hash', '-reviews', '-created_at', '-updated_at')
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
-    @hybrid_property
-    def password_hash(self):
-        return self._password_hash
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'admin': self.admin
+        }
 
-    @password_hash.setter
-    def password_hash(self, password):
-        self._password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    def authenticate(self, password):
-        return bcrypt.check_password_hash(self._password_hash, password)
-
-class Movie(db.Model, SerializerMixin):
-    __tablename__ = 'movies'
-
+class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, unique=True, nullable=False)
-    description = db.Column(db.String)
-    release_date = db.Column(db.DateTime)
-    director = db.Column(db.String)
-    rating = db.Column(db.Float)
+    title = db.Column(db.String(100))
+    description = db.Column(db.String(500))
+    release_date = db.Column(db.String(50))
+    director = db.Column(db.String(50))
+    rating = db.Column(db.String(10))
+    reviews = db.relationship('Review', backref='movie', lazy=True)
 
-    reviews = db.relationship('Review', backref='movie')
-    genres = association_proxy('movie_genres', 'genre')
+    def to_dict(self, rules=()):
+        movie_dict = {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'release_date': self.release_date,
+            'director': self.director,
+            'rating': self.rating
+        }
+        if '-reviews' not in rules:
+            movie_dict['reviews'] = [review.to_dict() for review in self.reviews]
+        return movie_dict
 
-    serialize_rules = ('-reviews', 'genres')
-
-class Review(db.Model, SerializerMixin):
-    __tablename__ = 'reviews'
-
+class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'))
-    content = db.Column(db.String)
-    rating = db.Column(db.Float)
+    content = db.Column(db.String(500))
+    rating = db.Column(db.String(10))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
-    serialize_rules = ('-user', '-movie')
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'rating': self.rating,
+            'user_id': self.user_id,
+            'movie_id': self.movie_id,
+            'timestamp': self.timestamp.isoformat()
+        }
 
-class Genre(db.Model, SerializerMixin):
-    __tablename__ = 'genres'
-
+class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    movies = db.relationship('MovieGenre', backref='genre', lazy=True)
 
-    movie_genres = db.relationship('MovieGenre', backref='genre')
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
-class MovieGenre(db.Model, SerializerMixin):
-    __tablename__ = 'movie_genres'
-
+class MovieGenre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'))
-    genre_id = db.Column(db.Integer, db.ForeignKey('genres.id'))
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=False)
+    genre_id = db.Column(db.Integer, db.ForeignKey('genre.id'), nullable=False)
 
-    serialize_rules = ('-movie', '-genre')
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'movie_id': self.movie_id,
+            'genre_id': self.genre_id
+        }
