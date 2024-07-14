@@ -2,6 +2,10 @@
 # Standard library imports
 from flask import request, session, jsonify, make_response
 from flask_restful import Resource
+from flask import Flask, request, jsonify, make_response
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+import requests
 
 # Local imports
 from config import app, db, api
@@ -144,6 +148,162 @@ api.add_resource(MoviesByID, '/movies/<int:id>')
 api.add_resource(Reviews, '/reviews')
 api.add_resource(Genres, '/genres')
 api.add_resource(MovieGenres, '/movie_genres')
+
+if __name__ == '__main__':
+    app.run(port=5555, debug=True)
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///movies.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.json.compact = False
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# Movie Model
+class Movie(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rank = db.Column(db.Integer)
+    title = db.Column(db.String(100))
+    description = db.Column(db.String(500))
+    image = db.Column(db.String(200))
+    big_image = db.Column(db.String(200))
+    genre = db.Column(db.String(50))
+    thumbnail = db.Column(db.String(200))
+    rating = db.Column(db.String(10))
+    year = db.Column(db.Integer)
+    imdbid = db.Column(db.String(20))
+    imdb_link = db.Column(db.String(200))
+
+@app.route('/')
+def index():
+    return make_response({'message': 'Welcome to the Movie Directory!'}, 200)
+
+# Fetch movies from external API and populate database
+@app.route('/fetch_movies', methods=['POST'])
+def fetch_movies():
+    url = "https://imdb-top-100-movies.p.rapidapi.com/top32"
+    headers = {
+        "x-rapidapi-host": "imdb-top-100-movies.p.rapidapi.com",
+        "x-rapidapi-key": "24e2f822dfmshf8b3b3ed65b271fp1d7e64jsna998c37aac2e"
+    }
+    
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        movies = response.json()
+        for movie_data in movies:
+            movie = Movie(
+                rank=movie_data.get('rank'),
+                title=movie_data.get('title'),
+                description=movie_data.get('description'),
+                image=movie_data.get('image'),
+                big_image=movie_data.get('big_image'),
+                genre=movie_data.get('genre'),
+                thumbnail=movie_data.get('thumbnail'),
+                rating=movie_data.get('rating'),
+                year=movie_data.get('year'),
+                imdbid=movie_data.get('imdbid'),
+                imdb_link=movie_data.get('imdb_link')
+            )
+            db.session.add(movie)
+        db.session.commit()
+        return make_response({'message': 'Movies fetched and added to the database.'}, 201)
+    else:
+        return make_response({'message': 'Failed to fetch movies.'}, 400)
+
+# CRUD operations for movies
+@app.route('/movies', methods=['POST'])
+def add_movie():
+    data = request.json
+    new_movie = Movie(
+        rank=data.get('rank'),
+        title=data.get('title'),
+        description=data.get('description'),
+        image=data.get('image'),
+        big_image=data.get('big_image'),
+        genre=data.get('genre'),
+        thumbnail=data.get('thumbnail'),
+        rating=data.get('rating'),
+        year=data.get('year'),
+        imdbid=data.get('imdbid'),
+        imdb_link=data.get('imdb_link')
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+    return make_response({'message': 'Movie added successfully.'}, 201)
+
+@app.route('/movies/<int:id>', methods=['GET'])
+def get_movie(id):
+    movie = Movie.query.get(id)
+    if movie:
+        movie_data = {
+            'id': movie.id,
+            'rank': movie.rank,
+            'title': movie.title,
+            'description': movie.description,
+            'image': movie.image,
+            'big_image': movie.big_image,
+            'genre': movie.genre,
+            'thumbnail': movie.thumbnail,
+            'rating': movie.rating,
+            'year': movie.year,
+            'imdbid': movie.imdbid,
+            'imdb_link': movie.imdb_link
+        }
+        return make_response(movie_data, 200)
+    else:
+        return make_response({'message': 'Movie not found.'}, 404)
+
+@app.route('/movies/<int:id>', methods=['PUT'])
+def update_movie(id):
+    movie = Movie.query.get(id)
+    if movie:
+        data = request.json
+        movie.rank = data.get('rank', movie.rank)
+        movie.title = data.get('title', movie.title)
+        movie.description = data.get('description', movie.description)
+        movie.image = data.get('image', movie.image)
+        movie.big_image = data.get('big_image', movie.big_image)
+        movie.genre = data.get('genre', movie.genre)
+        movie.thumbnail = data.get('thumbnail', movie.thumbnail)
+        movie.rating = data.get('rating', movie.rating)
+        movie.year = data.get('year', movie.year)
+        movie.imdbid = data.get('imdbid', movie.imdbid)
+        movie.imdb_link = data.get('imdb_link', movie.imdb_link)
+        
+        db.session.commit()
+        return make_response({'message': 'Movie updated successfully.'}, 200)
+    else:
+        return make_response({'message': 'Movie not found.'}, 404)
+
+@app.route('/movies/<int:id>', methods=['DELETE'])
+def delete_movie(id):
+    movie = Movie.query.get(id)
+    if movie:
+        db.session.delete(movie)
+        db.session.commit()
+        return make_response({'message': 'Movie deleted successfully.'}, 200)
+    else:
+        return make_response({'message': 'Movie not found.'}, 404)
+
+@app.route('/movies', methods=['GET'])
+def get_all_movies():
+    movies = Movie.query.all()
+    movies_list = [{
+        'id': movie.id,
+        'rank': movie.rank,
+        'title': movie.title,
+        'description': movie.description,
+        'image': movie.image,
+        'big_image': movie.big_image,
+        'genre': movie.genre,
+        'thumbnail': movie.thumbnail,
+        'rating': movie.rating,
+        'year': movie.year,
+        'imdbid': movie.imdbid,
+        'imdb_link': movie.imdb_link
+    } for movie in movies]
+    return make_response({'movies': movies_list}, 200)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
