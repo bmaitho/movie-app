@@ -1,8 +1,7 @@
 
 # Standard library imports
-from flask import request, session, jsonify, make_response
 from flask_restful import Resource
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request,session,  jsonify, make_response
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import requests
@@ -211,7 +210,6 @@ def fetch_movies():
     else:
         return make_response({'message': 'Failed to fetch movies.'}, 400)
 
-# CRUD operations for movies
 @app.route('/movies', methods=['POST'])
 def add_movie():
     data = request.json
