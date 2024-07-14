@@ -1,26 +1,24 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './NavBar.css'; // Import the CSS file
+// src/components/NavBar.js
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import './NavBar.css';
 
-function NavBar() {
-  return (
-    <nav className="navbar">
-      <ul className="navbar-list">
-        <li className="navbar-item">
-          <Link to="/" className="navbar-link">Home</Link>
-        </li>
-        <li className="navbar-item">
-          <Link to="/movies" className="navbar-link">Movies</Link>
-        </li>
-        <li className="navbar-item">
-          <Link to="/profile" className="navbar-link">Profile</Link>
-        </li>
-        <li className="navbar-item">
-          <Link to="/reviews" className="navbar-link">Reviews</Link>
-        </li>
-      </ul>
-    </nav>
-  );
-}
+const NavBar = () => {
+    const { currentUser } = useAuth();
+
+    if (!currentUser) return null;
+
+    return (
+        <nav>
+            <ul>
+                <li><Link to="/home">Home</Link></li>
+                <li><Link to="/movie">Movies</Link></li>
+                <li><Link to="/profile">Profile</Link></li>
+                <li><Link to="/review">Reviews</Link></li>
+            </ul>
+        </nav>
+    );
+};
 
 export default NavBar;

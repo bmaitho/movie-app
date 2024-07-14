@@ -1,29 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import './ProfilePage.css';
+// src/pages/ProfilePage.js
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-function ProfilePage() {
-  const [profile, setProfile] = useState(null);
+const ProfilePage = () => {
+    const { currentUser, logout } = useAuth();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch('/check_session')
-      .then(response => response.json())
-      .then(data => setProfile(data))
-      .catch(error => console.error('Error fetching profile:', error));
-  }, []);
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/login');
+        } catch (error) {
+            console.error('Failed to logout:', error);
+        }
+    };
 
-  return (
-    <div className="profile-page">
-      <h2>Profile Page</h2>
-      {profile ? (
+    return (
         <div>
-          <p>Username: {profile.username}</p>
-          <p>Email: {profile.email}</p>
+            <h1>Profile Page</h1>
+            <p>Welcome, {currentUser && currentUser.email}</p>
+            <button onClick={handleLogout}>Logout</button>
         </div>
-      ) : (
-        <p>Please log in to view your profile.</p>
-      )}
-    </div>
-  );
-}
+    );
+};
 
 export default ProfilePage;
