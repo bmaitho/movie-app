@@ -2,6 +2,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import './ProfilePage.css';
 
 const ProfilePage = () => {
     const { currentUser, logout } = useAuth();
@@ -17,10 +18,12 @@ const ProfilePage = () => {
     };
 
     return (
-        <div>
-            <h1>Profile Page</h1>
-            <p>Welcome, {currentUser && currentUser.email}</p>
-            <button onClick={handleLogout}>Logout</button>
+        <div className="profile-page">
+            <div>
+                <h1>Profile Page</h1>
+                <p>Welcome, {currentUser && currentUser.email}</p>
+                <button onClick={handleLogout}>Logout</button>
+            </div>
         </div>
     );
 };
