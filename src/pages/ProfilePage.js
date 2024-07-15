@@ -3,6 +3,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './ProfilePage.css';
+import './PageTitles.css';
 
 const ProfilePage = () => {
     const { currentUser, logout } = useAuth();
@@ -19,10 +20,10 @@ const ProfilePage = () => {
 
     return (
         <div className="profile-page">
-            <div>
-                <h1>Profile Page</h1>
-                <p>Welcome, {currentUser && currentUser.email}</p>
-                <button onClick={handleLogout}>Logout</button>
+            <div className="page-content">
+                <h1 className="page-title">Profile Page</h1>
+                <p className="welcome-text">Welcome, {currentUser && currentUser.email}</p>
+                <button className="logout-button" onClick={handleLogout}>Logout</button>
             </div>
         </div>
     );

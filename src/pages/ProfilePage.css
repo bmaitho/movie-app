@@ -40,3 +40,46 @@ body, html {
   position: relative;
   z-index: 2;
 }
+
+.page-content {
+  text-align: center;
+  animation: fadeIn 1s ease-out; /* Fade in animation for content */
+  padding: 20px; /* Add padding to content */
+}
+
+.page-title {
+  font-size: 3rem;
+  margin-bottom: 20px; /* Add spacing below title */
+  animation: fadeIn 1.5s ease-out; /* Fade in animation for title */
+}
+
+.welcome-text {
+  font-size: 1.5rem;
+  margin-bottom: 30px; /* Add spacing below welcome text */
+}
+
+.logout-button {
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  background-color: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #ff6b81;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}

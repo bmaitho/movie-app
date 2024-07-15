@@ -1,28 +1,17 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/ReviewPage.js
+import React from 'react';
 import './ReviewPage.css';
+import './PageTitles.css';
 
-function ReviewPage() {
-  const [reviews, setReviews] = useState([]);
-
-  useEffect(() => {
-    fetch('/reviews')
-      .then(response => response.json())
-      .then(data => setReviews(data))
-      .catch(error => console.error('Error fetching reviews:', error));
-  }, []);
-
-  return (
-    <div className="review-page">
-      <h2>Review List</h2>
-      <ul>
-        {reviews.map(review => (
-          <li key={review.id}>
-            {review.content} - {review.rating}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+const ReviewPage = () => {
+    return (
+        <div className="review-page">
+            <div className="page-content">
+                <h1 className="page-title">Review Page</h1>
+                <p className="review-description">This is where you can write and manage your movie reviews.</p>
+            </div>
+        </div>
+    );
+};
 
 export default ReviewPage;

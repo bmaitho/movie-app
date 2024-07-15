@@ -3,6 +3,7 @@ import './MoviePage.css';
 
 function MoviePage() {
   const [movies, setMovies] = useState([]);
+  const fullText = "Here you can find all your favorite movies and write reviews! Dive into our extensive collection and share your thoughts with the community.";
 
   useEffect(() => {
     fetch('/movies')
@@ -12,15 +13,19 @@ function MoviePage() {
   }, []);
 
   return (
-    <div className="movie-page">
-      <h2>Movie List</h2>
-      <ul>
-        {movies.map(movie => (
-          <li key={movie.id}>
-            {movie.title} - {movie.description}
-          </li>
-        ))}
-      </ul>
+    <div className="movie-page page-container">
+      <div className="page-overlay"></div>
+      <div className="page-content">
+        <h1 className="page-title">Movies</h1>
+        <p className="app-description">{fullText}</p>
+        <ul>
+          {movies.map(movie => (
+            <li key={movie.id}>
+              {movie.title} - {movie.description}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

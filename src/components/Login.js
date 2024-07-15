@@ -23,26 +23,28 @@ const Login = () => {
 
     return (
         <div className="auth-container">
-            <form onSubmit={handleLogin} className="auth-form">
+            <div className="auth-card">
                 <h1>Login</h1>
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                />
-                <button type="submit">Login</button>
-                {error && <p className="auth-error">{error}</p>}
+                <form onSubmit={handleLogin}>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
+                    />
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                    />
+                    <button type="submit">Login</button>
+                    {error && <p className="auth-error">{error}</p>}
+                </form>
                 <p>
                     Don't have an account? <Link to="/signup">Sign Up</Link>
                 </p>
-            </form>
+            </div>
         </div>
     );
 };
