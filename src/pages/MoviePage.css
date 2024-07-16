@@ -42,6 +42,11 @@ p {
   overflow: hidden;
   transition: transform 0.2s;
   color: #fff;
+  height: 100%; /* Ensures each card is the same height */
+}
+
+.movie-card.expanded {
+  height: auto; /* Expand the card to fit content when description is shown */
 }
 
 .movie-card:hover {
@@ -65,10 +70,20 @@ p {
   font-size: 1.5em;
 }
 
-.movie-card p {
+.movie-description {
   margin: 10px 0;
   color: #ddd;
-  display: none; /* Hide description by default */
+  overflow: hidden;
+  transition: max-height 0.3s ease-out; /* Smooth transition for description expansion */
+  max-height: 0; /* Hide description by default */
+}
+
+.movie-description.show {
+  max-height: 200px; /* Expand description height when shown */
+}
+
+.movie-description.hide {
+  max-height: 0; /* Hide description */
 }
 
 .btn-toggle-description {
@@ -78,33 +93,8 @@ p {
   padding: 8px 12px;
   cursor: pointer;
   margin-top: 10px;
-  text-align: center;
-  width: 100%; /* Make button width 100% */
-  border-radius: 0 0 10px 10px; /* Adjust border-radius to match card */
 }
 
 .btn-toggle-description:hover {
   background-color: #0056b3;
-}
-
-.btn-review {
-  background-color: #28a745;
-  color: #fff;
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  margin-top: 10px;
-  display: inline-block;
-}
-
-.btn-review:hover {
-  background-color: #218838;
-}
-
-.show {
-  display: block;
-}
-
-.hide {
-  display: none;
 }
