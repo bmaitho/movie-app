@@ -31,6 +31,7 @@ class Movie(db.Model):
     director = db.Column(db.String(50))
     rating = db.Column(db.String(10))
     reviews = db.relationship('Review', backref='movie', lazy=True)
+    poster_url = db.Column(db.String(255), nullable=True)
 
     def to_dict(self, rules=()):
         movie_dict = {
@@ -39,7 +40,8 @@ class Movie(db.Model):
             'description': self.description,
             'release_date': self.release_date,
             'director': self.director,
-            'rating': self.rating
+            'rating': self.rating,
+            'poster_url': self.poster_url
         }
         if '-reviews' not in rules:
             movie_dict['reviews'] = [review.to_dict() for review in self.reviews]

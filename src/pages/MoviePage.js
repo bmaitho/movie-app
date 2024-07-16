@@ -1,33 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import './MoviePage.css';
 
-function MoviePage() {
-  const [movies, setMovies] = useState([]);
-  const fullText = "Here you can find all your favorite movies and write reviews! Dive into our extensive collection and share your thoughts with the community.";
 
-  useEffect(() => {
-    fetch('/movies')
-      .then(response => response.json())
-      .then(data => setMovies(data))
-      .catch(error => console.error('Error fetching movies:', error));
-  }, []);
+const MoviePage = () => {
+    const [movies, setMovies] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  return (
-    <div className="movie-page page-container">
-      <div className="page-overlay"></div>
-      <div className="page-content">
-        <h1 className="page-title">Movies</h1>
-        <p className="app-description">{fullText}</p>
-        <ul>
-          {movies.map(movie => (
-            <li key={movie.id}>
-              {movie.title} - {movie.description}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
+    useEffect(() => {
+        const fetchMovies = async () => {
+            try {
+                const response = await fetch('http://localhost:5555/movies');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log(data);
+                setMovies(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMovies();
+    }, []);
+
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error}</p>;
+
+    return (
+        <div>
+            <h1>Movies</h1>
+            <p>Here you can find all your favorite movies and write reviews! Dive into our extensive collection and share your thoughts with the community.</p>
+            <ul>
+                {movies.map(movie => (
+                    <li key={movie.id}>
+                        {movie.poster_url && (
+                            <img src={movie.poster_url} alt={movie.title} style={{ width: '150px', height: 'auto' }} />
+
+                        )}
+                        <h2>{movie.title}</h2>
+                        <p>{movie.description}</p>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
 
 export default MoviePage;

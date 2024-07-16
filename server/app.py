@@ -60,8 +60,12 @@ class Home(Resource):
 
 class Movies(Resource):
     def get(self):
-        movies = [movie.to_dict(rules=('-reviews', )) for movie in Movie.query.all()]
-        return make_response(movies, 200)
+        movies = Movie.query.all()
+        for movie in movies:
+            print(movie.poster_url)  # Debugging: print URLs to ensure they are correct
+        movies_dict = [movie.to_dict(rules=('-reviews', )) for movie in movies]
+        return make_response(movies_dict, 200)
+
     
     def post(self):
         data = request.get_json()
