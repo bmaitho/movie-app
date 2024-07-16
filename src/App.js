@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -26,7 +25,7 @@ const App = () => {
                 <Route path="/home" element={<ProtectedRoute component={HomePage} />} />
                 <Route path="/movie" element={<ProtectedRoute component={MoviePage} />} />
                 <Route path="/profile" element={<ProtectedRoute component={ProfilePage} />} />
-                <Route path="/review" element={<ProtectedRoute component={ReviewPage} />} />
+                <Route path="/review/:movieId" element={<ProtectedRoute component={ReviewPage} />} />
                 <Route path="/" element={<ProtectedRoute component={HomePage} />} />
             </Routes>
         </AuthProvider>

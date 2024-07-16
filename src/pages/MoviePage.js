@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './MoviePage.css';
-
 
 const MoviePage = () => {
     const [movies, setMovies] = useState([]);
@@ -15,8 +15,12 @@ const MoviePage = () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log(data);
-                setMovies(data);
+                // Add showDescription property to each movie
+                const moviesWithDescription = data.map(movie => ({
+                    ...movie,
+                    showDescription: false
+                }));
+                setMovies(moviesWithDescription);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -27,22 +31,33 @@ const MoviePage = () => {
         fetchMovies();
     }, []);
 
+    const toggleDescription = (index) => {
+        const updatedMovies = [...movies];
+        updatedMovies[index].showDescription = !updatedMovies[index].showDescription;
+        setMovies(updatedMovies);
+    };
+
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div>
+        <div className="movie-page-container">
             <h1>Movies</h1>
             <p>Here you can find all your favorite movies and write reviews! Dive into our extensive collection and share your thoughts with the community.</p>
-            <ul>
-                {movies.map(movie => (
-                    <li key={movie.id}>
+            <ul className="movie-list">
+                {movies.map((movie, index) => (
+                    <li key={movie.id} className="movie-card">
                         {movie.poster_url && (
-                            <img src={movie.poster_url} alt={movie.title} style={{ width: '150px', height: 'auto' }} />
-
+                            <img src={movie.poster_url} alt={movie.title} />
                         )}
-                        <h2>{movie.title}</h2>
-                        <p>{movie.description}</p>
+                        <div className="movie-card-content">
+                            <h2>{movie.title}</h2>
+                            <p className={movie.showDescription ? 'show' : 'hide'}>{movie.description}</p>
+                            <button className="btn-toggle-description" onClick={() => toggleDescription(index)}>
+                                {movie.showDescription ? 'Hide Description' : 'Show Description'}
+                            </button>
+                            <Link to={`/review/${movie.id}`} className="btn-review">Write Review</Link>
+                        </div>
                     </li>
                 ))}
             </ul>

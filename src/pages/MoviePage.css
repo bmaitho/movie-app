@@ -1,76 +1,110 @@
-/* src/pages/MoviePage.css */
-
-@keyframes fadeIn {
-  from {
-      opacity: 0;
-      transform: translateY(-20px);
-  }
-  to {
-      opacity: 1;
-      transform: translateY(0);
-  }
-}
-
-@keyframes fadeInBackground {
-  from {
-      opacity: 0;
-  }
-  to {
-      opacity: 1;
-  }
-}
-
-.movie-page {
-  position: relative;
-  height: 100vh;
-  width: 100vw;
-  background: url('../assets/WhatsApp Image 2024-07-10 at 14.25.05.jpeg') no-repeat center center fixed;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-shadow: 2px 2px 4px #000;
-  animation: fadeInBackground 2s ease-out; /* Fade in animation for background */
-}
-
-.movie-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Adjust the opacity as needed */
-  z-index: 1;
-  animation: fadeIn 2s ease-out; /* Fade in animation for overlay */
-}
-
-.movie-page .page-content {
-  position: relative;
-  z-index: 2;
-  animation: fadeIn 1s ease-out; /* Fade in animation for content */
-  text-align: center; /* Center align content */
-  padding: 20px; /* Add padding to content */
-}
-
-.movie-page .page-title {
-  font-size: 2.5rem;
-  margin-bottom: 20px; /* Add spacing below title */
-  animation: fadeIn 1.5s ease-out; /* Fade in animation for title */
-}
-
-.movie-page .app-description {
-  font-size: 1.5rem; /* Adjust font size */
-}
-
-.movie-page ul {
-  list-style-type: none; /* Remove default list styling */
+/* MoviePage.css */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
   padding: 0;
-  margin: 20px 0 0 0; /* Add spacing above list */
-  font-size: 1.2rem; /* Adjust font size */
 }
 
-.movie-page li {
-  margin: 10px 0; /* Add spacing between list items */
+.movie-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-top: 20px;
+}
+
+p {
+  text-align: center;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 0;
+  list-style-type: none;
+}
+
+.movie-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #333;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+  color: #fff;
+}
+
+.movie-card:hover {
+  transform: scale(1.02);
+}
+
+.movie-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+}
+
+.movie-card-content {
+  padding: 20px;
+  flex: 1;
+}
+
+.movie-card h2 {
+  margin-top: 0;
+  color: #fff;
+  font-size: 1.5em;
+}
+
+.movie-card p {
+  margin: 10px 0;
+  color: #ddd;
+  display: none; /* Hide description by default */
+}
+
+.btn-toggle-description {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+  width: 100%; /* Make button width 100% */
+  border-radius: 0 0 10px 10px; /* Adjust border-radius to match card */
+}
+
+.btn-toggle-description:hover {
+  background-color: #0056b3;
+}
+
+.btn-review {
+  background-color: #28a745;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.btn-review:hover {
+  background-color: #218838;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }
