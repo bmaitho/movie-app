@@ -66,7 +66,6 @@ class Movies(Resource):
         movies_dict = [movie.to_dict(rules=('-reviews', )) for movie in movies]
         return make_response(movies_dict, 200)
 
-    
     def post(self):
         data = request.get_json()
         new_movie = Movie(
@@ -123,6 +122,23 @@ class Reviews(Resource):
         db.session.commit()
         return make_response(new_review.to_dict(), 201)
 
+class ReviewsByMovie(Resource):
+    def get(self, movie_id):
+        reviews = Review.query.filter_by(movie_id=movie_id).all()
+        reviews_dict = [
+            {
+                "id": review.id,
+                "user": {
+                    "username": review.user.username if review.user else "Anonymous"
+                },
+                "content": review.content,
+                "rating": review.rating,
+                "timestamp": review.timestamp.isoformat()
+            }
+            for review in reviews
+        ]
+        return make_response(reviews_dict, 200)
+
 class Genres(Resource):
     def get(self):
         genres = [genre.to_dict() for genre in Genre.query.all()]
@@ -148,6 +164,7 @@ api.add_resource(Logout, '/logout')
 api.add_resource(Movies, '/movies')
 api.add_resource(MoviesByID, '/movies/<int:id>')
 api.add_resource(Reviews, '/reviews')
+api.add_resource(ReviewsByMovie, '/movies/<int:movie_id>/reviews')
 api.add_resource(Genres, '/genres')
 api.add_resource(MovieGenres, '/movie_genres')
 

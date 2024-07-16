@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './MoviePage.css';
 
 const MoviePage = () => {
@@ -14,7 +15,6 @@ const MoviePage = () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                // Add showDescription property to each movie
                 const moviesWithDescription = data.map(movie => ({
                     ...movie,
                     showDescription: false
@@ -55,6 +55,8 @@ const MoviePage = () => {
                             <button className="btn-toggle-description" onClick={() => toggleDescription(index)}>
                                 {movie.showDescription ? 'Hide Description' : 'Show Description'}
                             </button>
+                            {/* Link to the review page */}
+                            <Link to={`/review/${movie.id}`}>View Reviews</Link>
                         </div>
                     </li>
                 ))}

@@ -9,10 +9,9 @@ import ProfilePage from "./pages/ProfilePage";
 import ReviewPage from "./pages/ReviewPage";
 import NavBar from "./components/NavBar";
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
+const ProtectedRoute = ({ children }) => {
     const { currentUser } = useAuth();
-
-    return currentUser ? <Component {...rest} /> : <Navigate to="/login" />;
+    return currentUser ? children : <Navigate to="/login" />;
 };
 
 const App = () => {
@@ -22,11 +21,31 @@ const App = () => {
             <Routes>
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/home" element={<ProtectedRoute component={HomePage} />} />
-                <Route path="/movie" element={<ProtectedRoute component={MoviePage} />} />
-                <Route path="/profile" element={<ProtectedRoute component={ProfilePage} />} />
-                <Route path="/review/:movieId" element={<ProtectedRoute component={ReviewPage} />} />
-                <Route path="/" element={<ProtectedRoute component={HomePage} />} />
+                <Route path="/home" element={
+                    <ProtectedRoute>
+                        <HomePage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/movie" element={
+                    <ProtectedRoute>
+                        <MoviePage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                    <ProtectedRoute>
+                        <ProfilePage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/review/:movieId" element={
+                    <ProtectedRoute>
+                        <ReviewPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/" element={
+                    <ProtectedRoute>
+                        <HomePage />
+                    </ProtectedRoute>
+                } />
             </Routes>
         </AuthProvider>
     );

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import './ReviewPage.css'; // Create a ReviewPage.css file for styling
+import './ReviewPage.css';
 
 const ReviewPage = () => {
-    const { movieId } = useParams(); // Extract movieId from URL params
+    const { movieId } = useParams();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,7 +16,12 @@ const ReviewPage = () => {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                setReviews(data);
+                // Check if data is an array and if each review has the expected properties
+                if (Array.isArray(data) && data.every(review => review.user && review.user.username)) {
+                    setReviews(data);
+                } else {
+                    throw new Error('Unexpected data format');
+                }
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -25,7 +30,7 @@ const ReviewPage = () => {
         };
 
         fetchReviews();
-    }, [movieId]); // Fetch reviews whenever movieId changes
+    }, [movieId]);
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
@@ -37,7 +42,8 @@ const ReviewPage = () => {
                 {reviews.map(review => (
                     <li key={review.id} className="review-card">
                         <div className="review-card-content">
-                            <h2>{review.user.username}</h2>
+                            {/* Check if review.user is defined */}
+                            <h2>{review.user ? review.user.username : 'Anonymous'}</h2>
                             <p>{review.content}</p>
                             <p>Rating: {review.rating}</p>
                             <p>Posted on: {new Date(review.timestamp).toLocaleDateString()}</p>

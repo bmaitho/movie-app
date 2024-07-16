@@ -55,6 +55,9 @@ class Review(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
+    # Define relationship to User
+    user = db.relationship('User', backref='reviews', lazy=True)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -62,7 +65,7 @@ class Review(db.Model):
             'rating': self.rating,
             'user_id': self.user_id,
             'movie_id': self.movie_id,
-            'timestamp': self.timestamp.isoformat()
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None
         }
 
 class Genre(db.Model):
