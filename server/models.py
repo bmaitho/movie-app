@@ -65,7 +65,12 @@ class Review(db.Model):
             'rating': self.rating,
             'user_id': self.user_id,
             'movie_id': self.movie_id,
-            'timestamp': self.timestamp.isoformat() if self.timestamp else None
+            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
+             'movie': {
+                'id': self.movie.id,
+                'title': self.movie.title,
+                'poster_url': self.movie.poster_url
+             }
         }
 
 class Genre(db.Model):

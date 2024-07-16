@@ -41,6 +41,11 @@ const App = () => {
                         <ReviewPage />
                     </ProtectedRoute>
                 } />
+                <Route path="/add-review/:movieId" element={
+                    <ProtectedRoute>
+                        <ReviewPage />  {/* This is a placeholder for adding a review */}
+                    </ProtectedRoute>
+                } />
                 <Route path="/" element={
                     <ProtectedRoute>
                         <HomePage />

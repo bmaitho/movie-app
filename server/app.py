@@ -124,20 +124,40 @@ class Reviews(Resource):
 
 class ReviewsByMovie(Resource):
     def get(self, movie_id):
+        movie = Movie.query.get(movie_id)
+        if not movie:
+            return make_response({'error': 'Movie not found'}, 404)
+
         reviews = Review.query.filter_by(movie_id=movie_id).all()
         reviews_dict = [
             {
                 "id": review.id,
-                "user": {
-                    "username": review.user.username if review.user else "Anonymous"
-                },
                 "content": review.content,
                 "rating": review.rating,
-                "timestamp": review.timestamp.isoformat()
+                "timestamp": review.timestamp.isoformat(),
+                "movie": {
+                    "id": movie.id,
+                    "title": movie.title,
+                    "poster_url": movie.poster_url
+                }
             }
             for review in reviews
         ]
         return make_response(reviews_dict, 200)
+
+class AllMoviesWithReviews(Resource):
+    def get(self):
+        movies = Movie.query.all()
+        movies_dict = [movie.to_dict(rules=()) for movie in movies]
+        
+        # Get reviews for each movie
+        for movie in movies_dict:
+            movie_id = movie['id']
+            reviews = Review.query.filter_by(movie_id=movie_id).all()
+            movie['reviews'] = [review.to_dict() for review in reviews]
+        
+        return make_response(movies_dict, 200)
+
 
 class Genres(Resource):
     def get(self):
@@ -167,6 +187,7 @@ api.add_resource(Reviews, '/reviews')
 api.add_resource(ReviewsByMovie, '/movies/<int:movie_id>/reviews')
 api.add_resource(Genres, '/genres')
 api.add_resource(MovieGenres, '/movie_genres')
+api.add_resource(AllMoviesWithReviews, '/all_movies_with_reviews')
 
 # Register blueprint
 app.register_blueprint(fetch_movies_bp)

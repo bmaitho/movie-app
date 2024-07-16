@@ -52,11 +52,82 @@ body, html {
 
 @keyframes fadeIn {
   from {
-      opacity: 0;
-      transform: translateY(-20px);
+    opacity: 0;
+    transform: translateY(-20px);
   }
   to {
-      opacity: 1;
-      transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.review-page-container {
+  padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.add-review-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.add-review-button:hover {
+  background-color: #0056b3;
+}
+
+.review-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.review-card {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  align-items: center;
+  background-color: #fff; /* Added for better readability */
+}
+
+.movie-poster {
+  width: 150px; /* Adjust the size as needed */
+  height: 200px; /* Adjust the size as needed */
+  border-radius: 8px;
+  margin-right: 15px;
+  object-fit: cover; /* Ensure the poster scales correctly */
+}
+
+.review-card-content {
+  max-width: 600px;
+}
+
+.review-card-content h2 {
+  margin: 0 0 10px;
+}
+
+.review-card-content p {
+  margin: 5px 0;
+}
+
+.add-review-button-to-movie {
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: block;
+}
+
+.add-review-button-to-movie:hover {
+  background-color: #218838;
 }

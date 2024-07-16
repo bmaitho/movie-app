@@ -1,56 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './ReviewPage.css';
 
 const ReviewPage = () => {
-    const { movieId } = useParams();
-    const [reviews, setReviews] = useState([]);
+    const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();  // Import useNavigate from 'react-router-dom'
 
     useEffect(() => {
-        const fetchReviews = async () => {
+        const fetchMoviesWithReviews = async () => {
             try {
-                const response = await fetch(`http://localhost:5555/movies/${movieId}/reviews`);
+                const response = await fetch('http://localhost:5555/all_movies_with_reviews');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                // Check if data is an array and if each review has the expected properties
-                if (Array.isArray(data) && data.every(review => review.user && review.user.username)) {
-                    setReviews(data);
-                } else {
-                    throw new Error('Unexpected data format');
-                }
+                setMovies(data);
             } catch (error) {
                 setError(error.message);
             } finally {
                 setLoading(false);
             }
         };
+    
+        fetchMoviesWithReviews();
+    }, []);
+    
 
-        fetchReviews();
-    }, [movieId]);
+    const handleAddReviewClick = (movieId) => {
+        navigate(`add-/review/${movieId}`);  // Ensure this matches the route defined in App.js
+    };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className="review-page-container">
-            <h1>Reviews</h1>
-            <ul className="review-list">
-                {reviews.map(review => (
-                    <li key={review.id} className="review-card">
-                        <div className="review-card-content">
-                            {/* Check if review.user is defined */}
-                            <h2>{review.user ? review.user.username : 'Anonymous'}</h2>
-                            <p>{review.content}</p>
-                            <p>Rating: {review.rating}</p>
-                            <p>Posted on: {new Date(review.timestamp).toLocaleDateString()}</p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+        <div className="reviews-page-container">
+            <h1>All Movies with Reviews</h1>
+            {movies.map(movie => (
+                <div key={movie.id} className="movie-section">
+                    <h2>{movie.title}</h2>
+                    <img src={movie.poster_url} alt={movie.title} className="movie-poster" />
+                    <button className="add-review-button" onClick={() => handleAddReviewClick(movie.id)}>
+                        Add Review
+                    </button>
+                    {movie.reviews.length > 0 ? (
+                        <ul className="review-list">
+                            {movie.reviews.map(review => (
+                                <li key={review.id} className="review-card">
+                                    <div className="review-card-content">
+                                        <h3>{review.user ? review.user.username : 'Anonymous'}</h3>
+                                        <p>{review.content}</p>
+                                        <p>Rating: {review.rating}</p>
+                                        <p>Posted on: {new Date(review.timestamp).toLocaleDateString()}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No reviews yet.</p>
+                    )}
+                </div>
+            ))}
         </div>
     );
 };
